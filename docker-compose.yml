@@ -1,0 +1,14 @@
+version: '3'
+services:
+  frontend:
+    env_file:
+      - .env.local
+    build: .
+    ports:
+      - '3000:3000'
+  backend:
+    build:
+      context: .
+      dockerfile: mock/Dockerfile
+    ports:
+      - '3001:3001'
