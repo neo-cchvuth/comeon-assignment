@@ -1,9 +1,10 @@
 'use client';
 
+import Input, { InputHandle } from '@/app/_components/input';
 import { postLogin } from '@/redux/features/auth/reducers';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { useRouter } from 'next/navigation';
-import { FormEvent, useState } from 'react';
+import { FormEvent, useRef } from 'react';
 
 import styles from './page.module.scss';
 
@@ -14,37 +15,29 @@ export default function Login() {
   const errorMessage = useAppSelector((state) => state.authReducer.error);
   const isLoading = useAppSelector((state) => state.authReducer.status === 'loading');
 
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const usernameRef = useRef<InputHandle>(null);
+  const passwordRef = useRef<InputHandle>(null);
 
   const onLogin = (event: FormEvent) => {
     event.preventDefault();
-    dispatch(postLogin({ username, password })).then((res) => {
-      if (res.meta.requestStatus === 'fulfilled') {
-        router.push('/');
-      }
-    });
+    if (usernameRef.current && passwordRef.current) {
+      dispatch(postLogin({ username: usernameRef.current.getValue(), password: passwordRef.current.getValue() })).then((res) => {
+        if (res.meta.requestStatus === 'fulfilled') {
+          router.push('/');
+        }
+      });
+    }
   };
 
   return (
     <div className="login">
       <div className="ui grid centered equal width">
         <span className={styles['error-message']}>{errorMessage}</span>
-        <form>
+        <form onSubmit={onLogin}>
           <div className="fields">
-            <div className="required field">
-              <div className="ui icon input">
-                <input type="text" name="username" placeholder="Username" onChange={(e) => setUsername(e.target.value)} />
-                <i className="user icon"></i>
-              </div>
-            </div>
-            <div className="required field">
-              <div className="ui icon input">
-                <input type="password" name="password" placeholder="Password" onChange={(e) => setPassword(e.target.value)} />
-                <i className="lock icon"></i>
-              </div>
-            </div>
-            <button className={`ui button ${isLoading ? 'loading disabled' : ''}`} onClick={onLogin}>
+            <Input name="username" placeholder="Username" icon="user" ref={usernameRef} />
+            <Input name="password" placeholder="Password" type="password" icon="lock" ref={passwordRef} />
+            <button className={`ui button ${isLoading ? 'loading disabled' : ''}`} type="submit">
               Login
               <i className="right chevron icon"></i>
             </button>
