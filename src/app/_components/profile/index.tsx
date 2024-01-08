@@ -5,6 +5,8 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
+import styles from './index.module.scss';
+
 export default function Profile() {
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -26,7 +28,7 @@ export default function Profile() {
   return (
     <div className="twelve wide column">
       <div className="ui list">
-        <div className="player item">
+        <div className={styles['player'] + ' item'}>
           {player && <Image className="ui avatar image" width={30} height={30} src={'/' + player.avatar} alt="" />}
           <div className="content">
             <div className="header">
