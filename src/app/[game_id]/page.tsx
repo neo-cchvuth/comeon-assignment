@@ -1,21 +1,24 @@
 'use client';
 
-import { useAppSelector } from '@/redux/hooks';
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import { useEffect, useMemo } from 'react';
 
 import comeon from '../../../public/lib/comeon.game-1.1.min';
 
 export default function InGame() {
   const router = useRouter();
-  const gameId = useAppSelector((state) => state.gamesReducer.activeGameId);
+  const searchParam = useParams();
+  const gameId = useMemo(() => {
+    return searchParam['game_id'];
+  }, [searchParam]);
 
   useEffect(() => {
-    if (!gameId) {
+    try {
+      comeon.game.launch(gameId);
+    } catch (err) {
+      console.error(gameId, err);
       return router.push('/');
     }
-
-    comeon.game.launch(gameId);
   }, [gameId, router]);
 
   return (

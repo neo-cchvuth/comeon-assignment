@@ -10,8 +10,6 @@ export type Game = {
 
 export type GamesState = {
   games: Game[];
-  searchTerms?: string;
-  activeGameId?: string;
 } & AsyncStatus;
 
 export type GamesResponse = Game[];

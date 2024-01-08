@@ -14,5 +14,4 @@ const categorySlice = createSlice({
   extraReducers,
 });
 
-export const { setGameId, setGameSearchTerms } = categorySlice.actions;
 export default categorySlice.reducer;

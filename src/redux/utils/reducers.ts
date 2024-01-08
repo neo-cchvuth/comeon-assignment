@@ -11,10 +11,10 @@ type FullfilledMeta<P> = {
   requestStatus: 'fulfilled';
 };
 
-export const addCaseToBuilderForStatus = <T extends AsyncStatus, R, P>(
-  builder: ActionReducerMapBuilder<T>,
-  thunk: ReturnType<typeof createAsyncThunk<R, P>>,
-  onFullfilledExtra?: CaseReducer<T, PayloadAction<R, string, FullfilledMeta<P>, never>>,
+export const addCaseToBuilderForStatus = <State extends AsyncStatus, Return, Payload>(
+  builder: ActionReducerMapBuilder<State>,
+  thunk: ReturnType<typeof createAsyncThunk<Return, Payload>>,
+  onFullfilledExtra?: CaseReducer<State, PayloadAction<Return, string, FullfilledMeta<Payload>, never>>,
 ) => {
   return builder
     .addCase(thunk.pending, (state) => {

@@ -1,27 +1,33 @@
 'use client';
 
-import { setGameId } from '@/redux/features/games';
 import { getGames } from '@/redux/features/games/reducers';
-import { selectGamesByCategoryAndKeyword } from '@/redux/features/games/selectors';
+import { selectGamesByCategory } from '@/redux/features/games/selectors';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo } from 'react';
 
 export default function Games() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const dispatch = useAppDispatch();
 
   const selectedCategory = useAppSelector((state) => state.categoriesReducer.selectedId);
-  const gamesSearchTerms = useAppSelector((state) => state.gamesReducer.searchTerms);
-  const games = useAppSelector(selectGamesByCategoryAndKeyword);
+  const gamesStatus = useAppSelector((state) => state.gamesReducer.status);
+  const gamesByCategory = useAppSelector(selectGamesByCategory);
+  const gamesSearchTerms = useMemo(() => {
+    return searchParams.get('q');
+  }, [searchParams]);
+  const games = useMemo(() => {
+    return gamesByCategory.filter((g) => !gamesSearchTerms || g.name.toLowerCase().includes(gamesSearchTerms.toLowerCase()));
+  }, [gamesByCategory, gamesSearchTerms]);
 
   useEffect(() => {
     dispatch(getGames());
   }, [dispatch]);
 
   const filterErrorMessage = useMemo(() => {
-    if (games.length === 0) {
+    if (gamesStatus && gamesStatus !== 'loading' && games.length === 0) {
       let message = 'No game was found.';
       if (gamesSearchTerms || selectedCategory) {
         message += ' Please try selecting a different category or use a different search term.';
@@ -29,11 +35,10 @@ export default function Games() {
 
       return <span data-test="filter-message">{message}</span>;
     }
-  }, [games, gamesSearchTerms, selectedCategory]);
+  }, [games, gamesSearchTerms, selectedCategory, gamesStatus]);
 
   const onPlay = (code: string) => {
-    dispatch(setGameId(code));
-    router.push('/ingame');
+    router.push(`/${code}`);
   };
 
   return (

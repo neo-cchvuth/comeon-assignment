@@ -1,11 +1,13 @@
-import { setGameSearchTerms } from '@/redux/features/games';
-import { useAppDispatch } from '@/redux/hooks';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function GameSearchBar() {
-  const dispatch = useAppDispatch();
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   const onSearch = (value: string) => {
-    dispatch(setGameSearchTerms(value));
+    const current = new URLSearchParams(Array.from(searchParams.entries()));
+    current.set('q', value);
+    router.replace('./?' + current.toString());
   };
 
   return (
